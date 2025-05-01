@@ -52,19 +52,31 @@ namespace _5HW_System_Programming
                 bool includeQuest = Ask("Кількість питальних речень?");
                 bool includeExcl = Ask("Кількість окличних речень?");
 
-                string report = await Task.Run(() =>
-                    AnalyzeText(text, includeSent, includeWords, includeChar, includeQuest, includeExcl)
-                );
+                var tasks = new List<Task<string>>();
+
+                if (includeSent)
+                    tasks.Add(Task.Run(() => $"Кількість речень: {Regex.Matches(text, @"[.!?]").Count}"));
+                if (includeWords)
+                    tasks.Add(Task.Run(() => $"Кількість слів: {Regex.Matches(text, @"\b\w+\b").Count}"));
+                if (includeChar)
+                    tasks.Add(Task.Run(() => $"Кількість символів: {text.Length}"));
+                if (includeQuest)
+                    tasks.Add(Task.Run(() => $"Кількість питальних речень: {Regex.Matches(text, @"\?").Count}"));
+                if (includeExcl)
+                    tasks.Add(Task.Run(() => $"Кількість окличних речень: {Regex.Matches(text, @"!").Count}"));
+
+                var results = await Task.WhenAll(tasks);
 
                 Console.WriteLine("\n=== ЗВІТ ===");
-                Console.WriteLine(report);
+                foreach (var line in results)
+                    Console.WriteLine(line);
 
                 Console.Write("Зберегти звіт у файл? (y/n): ");
                 if (Console.ReadLine().ToLower() == "y")
                 {
                     Console.Write("Введіть шлях до файлу для збереження: ");
                     string savePath = Console.ReadLine();
-                    await File.WriteAllTextAsync(savePath, report);
+                    await File.WriteAllLinesAsync(savePath, results);
                     Console.WriteLine("Звіт збережено.");
                 }
 
@@ -79,31 +91,5 @@ namespace _5HW_System_Programming
             Console.Write(message + " ");
             return Console.ReadLine().Trim().ToLower() == "y";
         }
-
-        static string AnalyzeText(string text, bool includeSent, bool includeWords,
-                                  bool includeChar, bool includeQuest, bool includeExcl)
-        {
-            int sentCount = Regex.Matches(text, @"[.!?]").Count;
-            int questCount = Regex.Matches(text, @"\?").Count;
-            int exclCount = Regex.Matches(text, @"!").Count;
-            int charCount = text.Length;
-            int wordCount = Regex.Matches(text, @"\b\w+\b").Count;
-
-            string report = "";
-
-            if (includeSent)
-                report += $"Кількість речень: {sentCount}\n";
-            if (includeWords)
-                report += $"Кількість слів: {wordCount}\n";
-            if (includeChar)
-                report += $"Кількість символів: {charCount}\n";
-            if (includeQuest)
-                report += $"Кількість питальних речень: {questCount}\n";
-            if (includeExcl)
-                report += $"Кількість окличних речень: {exclCount}\n";
-
-            return report;
-        }
-
     }
 }
