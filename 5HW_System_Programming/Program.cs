@@ -8,16 +8,11 @@ namespace _5HW_System_Programming
         {
             while (true)
             {
-                Console.WriteLine("Виберіть джерело тексту:");
-                Console.WriteLine("1 - Зчитати з файлу");
-                Console.WriteLine("2 - Ввести текст вручну");
-                Console.WriteLine("0 - Вийти");
-
-                string choice = Console.ReadLine();
-                if (choice == "0") break;
+                Console.WriteLine("Виберіть джерело тексту:\n1. Файл\n2. Консоль\n0. Вихід");
 
                 string text = "";
-
+                string choice = Console.ReadLine();
+                if (choice == "0") break;
                 if (choice == "1")
                 {
                     Console.Write("Введіть шлях до текстового файлу: ");
